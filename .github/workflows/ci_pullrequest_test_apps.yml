@@ -56,9 +56,10 @@ jobs:
               "floor-plan" 
               "golden-config" 
               "nornir"
-              "secrets-providers" 
               "ssot" 
           )
+          # "secrets-providers" needs more groups installed or it will prevent the app from starting up
+          POETRY_ADD="git+https://github.com/nautobot/nautobot-app-secrets-providers#develop[dev,hashicorp,thycotic]"
           for app in "${nautobot_apps[@]}"; do
               POETRY_ADD="$POETRY_ADD git+https://github.com/nautobot/nautobot-app-${app}.git#develop[dev]"
           done
