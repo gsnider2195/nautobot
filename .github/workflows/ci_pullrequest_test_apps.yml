@@ -41,7 +41,7 @@ jobs:
           python-version: "3.12"
       - name: "Install the apps"
         run: |
-          cp development/nautobot_config_all_apps.py nautobot/core/tests/nautobot_config.py
+          cp nautobot/core/tests/nautobot_config_all_apps.py nautobot/core/tests/nautobot_config.py
           nautobot_apps=(
               "bgp-models"
               "capacity-metrics"
