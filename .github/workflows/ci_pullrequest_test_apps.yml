@@ -55,7 +55,7 @@ jobs:
               "firewall-models" 
               "floor-plan" 
               "golden-config" 
-              "nornir",
+              "nornir"
               "secrets-providers" 
               "ssot" 
               "welcome-wizard" 
