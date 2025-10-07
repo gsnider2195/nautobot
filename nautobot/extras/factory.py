@@ -264,7 +264,20 @@ class MetadataTypeFactory(PrimaryModelFactory):
                 self.content_types.set(extracted)
             else:
                 existing_content_type_pks = []
-                for content_type in ContentType.objects.all():
+                for content_type in ContentType.objects.filter(
+                    app_label__in=[
+                        "circuits",
+                        "cloud",
+                        "dcim",
+                        "extras",
+                        "ipam",
+                        "tenancy",
+                        "virtualization",
+                        "wireless",
+                    ]
+                ):
+                    if not content_type._meta.managed:
+                        continue
                     if content_type.model_class().objects.exists():
                         existing_content_type_pks.append(content_type.id)
                 self.content_types.set(
