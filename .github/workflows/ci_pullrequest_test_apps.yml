@@ -1,0 +1,69 @@
+---
+# Test all apps in CI
+name: "CI - Pull Request Test All Apps"
+concurrency:  # Cancel any existing runs of this workflow for this same PR
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+on:  # yamllint disable
+  pull_request:
+  workflow_call:
+
+jobs:
+  tests-postgres:
+    name: "Unit tests (PostgreSQL and Python 3.12)"
+    runs-on: "ubuntu-24.04"
+    env:
+      INVOKE_NAUTOBOT_LOCAL: "True"
+      NAUTOBOT_DB_USER: "nautobot"
+      NAUTOBOT_DB_PASSWORD: "decinablesprewad"
+      NAUTOBOT_DB_ENGINE: "django_prometheus.db.backends.postgresql"
+    services:
+      postgres:
+        image: "postgres:13-alpine"
+        env:
+          POSTGRES_USER: "nautobot"
+          POSTGRES_PASSWORD: "decinablesprewad"
+          POSTGRES_DB: "nautobot"
+        ports:
+          - "5432:5432"
+      redis:
+        image: "redis:6-alpine"
+        ports:
+          - "6379:6379"
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v4"
+      - name: "Setup environment"
+        uses: "networktocode/gh-action-setup-poetry-environment@v6"
+        with:
+          poetry-install-options: ""  # override default "--only dev"
+          poetry-version: "2.1.4"
+          python-version: "3.12"
+      - name: "Install the apps"
+        run: |
+          cp development/nautobot_config_all_apps.py nautobot/core/tests/nautobot_config.py
+          nautobot_apps=( 
+              "bgp-models" 
+              "capacity-metrics" 
+              "chatops" 
+              "circuit-maintenance" 
+              "data-validation-engine" 
+              "device-lifecycle-mgmt" 
+              "device-onboarding" 
+              "design-builder" 
+              "dns-models" 
+              "firewall-models" 
+              "floor-plan" 
+              "golden-config" 
+              "netbox-importer" 
+              "secrets-providers" 
+              "ssot" 
+              "welcome-wizard" 
+          )
+          for app in "${nautobot_apps[@]}"; do
+              POETRY_ADD="$POETRY_ADD git+https://github.com/nautobot/nautobot-app-${app}.git#develop[dev]"
+          done
+          poetry add $POETRY_ADD
+      - name: "Run unittest"
+        run: "poetry run invoke tests --failfast --no-keepdb --no-cache-test-fixtures --parallel"
+
