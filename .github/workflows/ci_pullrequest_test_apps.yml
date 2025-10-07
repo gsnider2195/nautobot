@@ -48,14 +48,14 @@ jobs:
               "chatops" 
               "circuit-maintenance" 
               "data-validation-engine" 
+              "design-builder" 
               "device-lifecycle-mgmt" 
               "device-onboarding" 
-              "design-builder" 
               "dns-models" 
               "firewall-models" 
               "floor-plan" 
               "golden-config" 
-              "netbox-importer" 
+              "nornir",
               "secrets-providers" 
               "ssot" 
               "welcome-wizard" 
@@ -65,5 +65,5 @@ jobs:
           done
           poetry add $POETRY_ADD
       - name: "Run unittest"
-        run: "poetry run invoke tests --failfast --no-keepdb --no-cache-test-fixtures --parallel"
+        run: "poetry run invoke tests --no-keepdb --no-cache-test-fixtures --parallel"
 

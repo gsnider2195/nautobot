@@ -19,22 +19,22 @@ JOBS_ROOT = os.path.join(
 PLUGINS = [
     "example_app",
     "example_app_with_view_override",
-    "nautobot_secrets_providers",
-    "nautobot_capacity_metrics",
     "nautobot_bgp_models",
+    "nautobot_capacity_metrics",
     "nautobot_chatops",
     "nautobot_circuit_maintenance",
     "nautobot_data_validation_engine",
     "nautobot_design_builder",
     "nautobot_device_lifecycle_mgmt",
     "nautobot_device_onboarding",
+    "nautobot_dns_models", 
     "nautobot_firewall_models",
     "nautobot_floor_plan",
-    "nautobot_plugin_nornir",
     "nautobot_golden_config",
+    "nautobot_plugin_nornir",
+    "nautobot_secrets_providers",
     "nautobot_ssot",
-    "nautobot_load_balancer_models",
-    "nautobot_ansible_automation",
+    "nautobot_welcome_wizard", 
 ]
 
 # Hard-code the SECRET_KEY for simplicity
