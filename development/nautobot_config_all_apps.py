@@ -27,7 +27,7 @@ PLUGINS = [
     "nautobot_design_builder",
     "nautobot_device_lifecycle_mgmt",
     "nautobot_device_onboarding",
-    "nautobot_dns_models", 
+    "nautobot_dns_models",
     "nautobot_firewall_models",
     "nautobot_floor_plan",
     "nautobot_golden_config",
