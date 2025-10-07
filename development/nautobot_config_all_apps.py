@@ -34,7 +34,6 @@ PLUGINS = [
     "nautobot_plugin_nornir",
     "nautobot_secrets_providers",
     "nautobot_ssot",
-    "nautobot_welcome_wizard", 
 ]
 
 # Hard-code the SECRET_KEY for simplicity

@@ -58,7 +58,6 @@ jobs:
               "nornir"
               "secrets-providers" 
               "ssot" 
-              "welcome-wizard" 
           )
           for app in "${nautobot_apps[@]}"; do
               POETRY_ADD="$POETRY_ADD git+https://github.com/nautobot/nautobot-app-${app}.git#develop[dev]"
