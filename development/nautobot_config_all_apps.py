@@ -55,8 +55,8 @@ STORAGE_CONFIG = {
 # Use in-memory Constance backend instead of database backend so that settings don't leak between parallel tests.
 CONSTANCE_BACKEND = "constance.backends.memory.MemoryBackend"
 
-# Enable test data factories, as they're a pre-requisite for Nautobot core tests.
-TEST_USE_FACTORIES = True
+# Disable test data factories for apps tests
+TEST_USE_FACTORIES = False
 # For now, use a constant PRNG seed for consistent results. In the future we can remove this for fuzzier testing.
 TEST_FACTORY_SEED = "Nautobot"
 
