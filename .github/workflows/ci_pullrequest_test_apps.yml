@@ -42,21 +42,21 @@ jobs:
       - name: "Install the apps"
         run: |
           cp development/nautobot_config_all_apps.py nautobot/core/tests/nautobot_config.py
-          nautobot_apps=( 
-              "bgp-models" 
-              "capacity-metrics" 
-              "chatops" 
-              "circuit-maintenance" 
-              "data-validation-engine" 
-              "design-builder" 
-              "device-lifecycle-mgmt" 
-              "device-onboarding" 
-              "dns-models" 
-              "firewall-models" 
-              "floor-plan" 
-              "golden-config" 
+          nautobot_apps=(
+              "bgp-models"
+              "capacity-metrics"
+              "chatops"
+              "circuit-maintenance"
+              "data-validation-engine"
+              "design-builder"
+              "device-lifecycle-mgmt"
+              "device-onboarding"
+              "dns-models"
+              "firewall-models"
+              "floor-plan"
+              "golden-config"
               "nornir"
-              "ssot" 
+              "ssot"
           )
           # "secrets-providers" needs more groups installed or it will prevent the app from starting up
           POETRY_ADD="git+https://github.com/nautobot/nautobot-app-secrets-providers#develop[dev,hashicorp,thycotic]"
@@ -65,5 +65,19 @@ jobs:
           done
           poetry add $POETRY_ADD
       - name: "Run unittest"
-        run: "poetry run invoke tests --no-keepdb --no-cache-test-fixtures --parallel"
-
+        run: |
+          poetry run invoke tests --no-keepdb --no-cache-test-fixtures --parallel --label '\
+              nautobot_bgp_models \
+              nautobot_capacity_metrics \
+              nautobot_chatops \
+              nautobot_circuit_maintenance \
+              nautobot_data_validation_engine \
+              nautobot_design_builder \
+              nautobot_device_lifecycle_mgmt \
+              nautobot_device_onboarding \
+              nautobot_dns_models \
+              nautobot_firewall_models \
+              nautobot_floor_plan \
+              nautobot_golden_config \
+              nautobot_plugin_nornir \
+              nautobot_ssot'"
