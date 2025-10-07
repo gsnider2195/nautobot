@@ -65,4 +65,4 @@ jobs:
           done
           poetry add $POETRY_ADD
       - name: "Run unittest"
-        run: "poetry run invoke tests --no-keepdb --no-cache-test-fixtures --parallel --label 'nautobot_bgp_models nautobot_capacity_metrics nautobot_chatops nautobot_circuit_maintenance nautobot_data_validation_engine nautobot_design_builder nautobot_device_lifecycle_mgmt nautobot_device_onboarding nautobot_dns_models nautobot_firewall_models nautobot_floor_plan nautobot_golden_config nautobot_plugin_nornir nautobot_ssot'"
+        run: "poetry run invoke tests --no-keepdb --no-cache-test-fixtures --label 'nautobot_bgp_models nautobot_capacity_metrics nautobot_chatops nautobot_circuit_maintenance nautobot_data_validation_engine nautobot_design_builder nautobot_device_lifecycle_mgmt nautobot_device_onboarding nautobot_dns_models nautobot_firewall_models nautobot_floor_plan nautobot_golden_config nautobot_plugin_nornir nautobot_ssot'"
