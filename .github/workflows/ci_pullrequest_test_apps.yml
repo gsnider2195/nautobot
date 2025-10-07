@@ -56,13 +56,11 @@ jobs:
               "floor-plan"
               "golden-config"
               "nornir"
+              "secrets-providers"
               "ssot"
           )
-          # "secrets-providers" needs more groups installed or it will prevent the app from starting up
-          POETRY_ADD="git+https://github.com/nautobot/nautobot-app-secrets-providers#develop[dev,hashicorp,thycotic]"
           for app in "${nautobot_apps[@]}"; do
-              POETRY_ADD="$POETRY_ADD git+https://github.com/nautobot/nautobot-app-${app}.git#develop[dev]"
+              poetry add "git+https://github.com/nautobot/nautobot-app-${app}.git#develop[dev]" --extras all
           done
-          poetry add $POETRY_ADD
       - name: "Run unittest"
-        run: "poetry run invoke tests --no-keepdb --no-cache-test-fixtures --no-parallel --label 'nautobot_bgp_models nautobot_capacity_metrics nautobot_chatops nautobot_circuit_maintenance nautobot_data_validation_engine nautobot_design_builder nautobot_device_lifecycle_mgmt nautobot_device_onboarding nautobot_dns_models nautobot_firewall_models nautobot_floor_plan nautobot_golden_config nautobot_plugin_nornir nautobot_ssot'"
+        run: "poetry run invoke tests --no-keepdb --no-cache-test-fixtures --no-parallel --label 'nautobot_bgp_models nautobot_capacity_metrics nautobot_chatops nautobot_circuit_maintenance nautobot_data_validation_engine nautobot_design_builder nautobot_device_lifecycle_mgmt nautobot_device_onboarding nautobot_dns_models nautobot_firewall_models nautobot_floor_plan nautobot_golden_config nautobot_plugin_nornir nautobot_secrets_providers nautobot_ssot'"
