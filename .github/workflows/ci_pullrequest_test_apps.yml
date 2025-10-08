@@ -11,8 +11,8 @@ on:  # yamllint disable
 jobs:
   tests-postgres:
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         include:
           - app_url: "bgp-models"
             python_package_name: "nautobot_bgp_models"
