@@ -12,6 +12,7 @@ jobs:
   tests-postgres:
     strategy:
       matrix:
+        fail-fast: false
         include:
           - app_url: "bgp-models"
             python_package_name: "nautobot_bgp_models"
