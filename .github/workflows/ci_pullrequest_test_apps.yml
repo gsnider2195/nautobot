@@ -10,6 +10,39 @@ on:  # yamllint disable
 
 jobs:
   tests-postgres:
+    strategy:
+      matrix:
+        include:
+          - app_url: "bgp-models"
+            python_package_name: "nautobot_bgp_models"
+          - app_url: "capacity-metrics"
+            python_package_name: "nautobot_capacity_metrics"
+          - app_url: "chatops"
+            python_package_name: "nautobot_chatops"
+          - app_url: "circuit-maintenance"
+            python_package_name: "nautobot_circuit_maintenance"
+          - app_url: "data-validation-engine"
+            python_package_name: "nautobot_data_validation_engine"
+          - app_url: "design-builder"
+            python_package_name: "nautobot_design_builder"
+          - app_url: "device-lifecycle-mgmt"
+            python_package_name: "nautobot_device_lifecycle_mgmt"
+          - app_url: "device-onboarding"
+            python_package_name: "nautobot_device_onboarding"
+          - app_url: "dns-models"
+            python_package_name: "nautobot_dns_models"
+          - app_url: "firewall-models"
+            python_package_name: "nautobot_firewall_models"
+          - app_url: "floor-plan"
+            python_package_name: "nautobot_floor_plan"
+          - app_url: "golden-config"
+            python_package_name: "nautobot_golden_config"
+          - app_url: "nornir"
+            python_package_name: "nautobot_plugin_nornir"
+          - app_url: "secrets-providers"
+            python_package_name: "nautobot_secrets_providers"
+          - app_url: "ssot"
+            python_package_name: "nautobot_ssot"
     name: "Unit tests (PostgreSQL and Python 3.12)"
     runs-on: "ubuntu-24.04"
     env:
@@ -39,28 +72,10 @@ jobs:
           poetry-install-options: ""  # override default "--only dev"
           poetry-version: "2.1.4"
           python-version: "3.12"
-      - name: "Install the apps"
+      - name: "Install the app"
         run: |
-          cp nautobot/core/tests/nautobot_config_all_apps.py nautobot/core/tests/nautobot_config.py
-          nautobot_apps=(
-              "bgp-models"
-              "capacity-metrics"
-              "chatops"
-              "circuit-maintenance"
-              "data-validation-engine"
-              "design-builder"
-              "device-lifecycle-mgmt"
-              "device-onboarding"
-              "dns-models"
-              "firewall-models"
-              "floor-plan"
-              "golden-config"
-              "nornir"
-              "secrets-providers"
-              "ssot"
-          )
-          for app in "${nautobot_apps[@]}"; do
-              poetry add "git+https://github.com/nautobot/nautobot-app-${app}.git#develop[dev]" --extras all
-          done
+          sed -i -z 's/PLUGINS = \[[^]]*]/PLUGINS = ["${{ matrix.python_package_name }}"]/' nautobot/core/tests/nautobot_config.py
+          sed -i 's/TEST_USE_FACTORIES = .*$/TEST_USE_FACTORIES = False/' nautobot/core/tests/nautobot_config.py
+          poetry add "git+https://github.com/nautobot/nautobot-app-${{ matrix.app_url }}.git#develop[dev]" --extras all
       - name: "Run unittest"
-        run: "poetry run invoke tests --no-keepdb --no-cache-test-fixtures --no-parallel --label 'nautobot_bgp_models nautobot_capacity_metrics nautobot_chatops nautobot_circuit_maintenance nautobot_data_validation_engine nautobot_design_builder nautobot_device_lifecycle_mgmt nautobot_device_onboarding nautobot_dns_models nautobot_firewall_models nautobot_floor_plan nautobot_golden_config nautobot_plugin_nornir nautobot_secrets_providers nautobot_ssot'"
+        run: "poetry run invoke tests --no-keepdb --no-cache-test-fixtures --no-parallel --label ${{ matrix.python_package_name }}"
