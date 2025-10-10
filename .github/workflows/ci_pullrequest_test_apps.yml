@@ -9,47 +9,14 @@ on:  # yamllint disable
   workflow_call:
 
 jobs:
-  tests-postgres:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - app_url: "bgp-models"
-            python_package_name: "nautobot_bgp_models"
-          - app_url: "capacity-metrics"
-            python_package_name: "nautobot_capacity_metrics"
-          - app_url: "chatops"
-            python_package_name: "nautobot_chatops"
-          - app_url: "circuit-maintenance"
-            python_package_name: "nautobot_circuit_maintenance"
-          - app_url: "data-validation-engine"
-            python_package_name: "nautobot_data_validation_engine"
-          - app_url: "design-builder"
-            python_package_name: "nautobot_design_builder"
-          - app_url: "device-lifecycle-mgmt"
-            python_package_name: "nautobot_device_lifecycle_mgmt"
-          - app_url: "device-onboarding"
-            python_package_name: "nautobot_device_onboarding"
-          - app_url: "dns-models"
-            python_package_name: "nautobot_dns_models"
-          - app_url: "firewall-models"
-            python_package_name: "nautobot_firewall_models"
-          - app_url: "floor-plan"
-            python_package_name: "nautobot_floor_plan"
-          - app_url: "golden-config"
-            python_package_name: "nautobot_golden_config"
-          - app_url: "nornir"
-            python_package_name: "nautobot_plugin_nornir"
-          - app_url: "secrets-providers"
-            python_package_name: "nautobot_secrets_providers"
-          - app_url: "ssot"
-            python_package_name: "nautobot_ssot"
-    name: "Unit tests (PostgreSQL and Python 3.12)"
+  load-db-dump:
+    name: "Load migrated nautobot database dump"
     runs-on: "ubuntu-24.04"
     env:
       INVOKE_NAUTOBOT_LOCAL: "True"
       NAUTOBOT_DB_USER: "nautobot"
       NAUTOBOT_DB_PASSWORD: "decinablesprewad"
+      PGPASSWORD: "decinablesprewad"
       NAUTOBOT_DB_ENGINE: "django_prometheus.db.backends.postgresql"
     services:
       postgres:
@@ -65,6 +32,24 @@ jobs:
         ports:
           - "6379:6379"
     steps:
+      - name: "Checkout db dumps repository"
+        uses: actions/checkout@v5
+        with:
+          repository: "gsnider2195/nautobot-db-dumps"
+          ref: "dumps"
+          # Relative path under $GITHUB_WORKSPACE to place the repository
+          path: "db_dumps"
+          # Do a sparse checkout on given patterns. Each pattern should be separated with
+          # new lines.
+          # Default: null
+          sparse-checkout: "nautobotlatest-pgdump.sql"
+          # Specifies whether to use cone-mode when doing a sparse checkout.
+          # Default: true
+          sparse-checkout-cone-mode: false
+      - name: "Load database dump into the postgres database"
+        run: |
+          pg_restore -h localhost -d nautobot -U $NAUTOBOT_DB_USER < db_dumps/nautobotlatest-pgdump.sql
+      # For testing, run check-migrations to verify the dump has loaded
       - name: "Check out repository code"
         uses: "actions/checkout@v4"
       - name: "Setup environment"
@@ -73,10 +58,78 @@ jobs:
           poetry-install-options: ""  # override default "--only dev"
           poetry-version: "2.1.4"
           python-version: "3.12"
-      - name: "Install the app"
-        run: |
-          sed -i -z 's/PLUGINS = \[[^]]*]/PLUGINS = ["${{ matrix.python_package_name }}"]/' nautobot/core/tests/nautobot_config.py
-          sed -i 's/TEST_USE_FACTORIES = .*$/TEST_USE_FACTORIES = False/' nautobot/core/tests/nautobot_config.py
-          poetry add "git+https://github.com/nautobot/nautobot-app-${{ matrix.app_url }}.git#develop[dev]" --extras all
-      - name: "Run unittest"
-        run: "poetry run invoke tests --no-keepdb --no-cache-test-fixtures --no-parallel --label ${{ matrix.python_package_name }}"
+      - name: "Run check-migrations"
+        run: "poetry run invoke check-migrations"
+
+
+  # tests-postgres:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - app_url: "bgp-models"
+  #           python_package_name: "nautobot_bgp_models"
+  #         - app_url: "capacity-metrics"
+  #           python_package_name: "nautobot_capacity_metrics"
+  #         - app_url: "chatops"
+  #           python_package_name: "nautobot_chatops"
+  #         - app_url: "circuit-maintenance"
+  #           python_package_name: "nautobot_circuit_maintenance"
+  #         - app_url: "data-validation-engine"
+  #           python_package_name: "nautobot_data_validation_engine"
+  #         - app_url: "design-builder"
+  #           python_package_name: "nautobot_design_builder"
+  #         - app_url: "device-lifecycle-mgmt"
+  #           python_package_name: "nautobot_device_lifecycle_mgmt"
+  #         - app_url: "device-onboarding"
+  #           python_package_name: "nautobot_device_onboarding"
+  #         - app_url: "dns-models"
+  #           python_package_name: "nautobot_dns_models"
+  #         - app_url: "firewall-models"
+  #           python_package_name: "nautobot_firewall_models"
+  #         - app_url: "floor-plan"
+  #           python_package_name: "nautobot_floor_plan"
+  #         - app_url: "golden-config"
+  #           python_package_name: "nautobot_golden_config"
+  #         - app_url: "nornir"
+  #           python_package_name: "nautobot_plugin_nornir"
+  #         - app_url: "secrets-providers"
+  #           python_package_name: "nautobot_secrets_providers"
+  #         - app_url: "ssot"
+  #           python_package_name: "nautobot_ssot"
+  #   name: "Unit tests (PostgreSQL and Python 3.12)"
+  #   runs-on: "ubuntu-24.04"
+  #   env:
+  #     INVOKE_NAUTOBOT_LOCAL: "True"
+  #     NAUTOBOT_DB_USER: "nautobot"
+  #     NAUTOBOT_DB_PASSWORD: "decinablesprewad"
+  #     NAUTOBOT_DB_ENGINE: "django_prometheus.db.backends.postgresql"
+  #   services:
+  #     postgres:
+  #       image: "postgres:13-alpine"
+  #       env:
+  #         POSTGRES_USER: "nautobot"
+  #         POSTGRES_PASSWORD: "decinablesprewad"
+  #         POSTGRES_DB: "nautobot"
+  #       ports:
+  #         - "5432:5432"
+  #     redis:
+  #       image: "redis:6-alpine"
+  #       ports:
+  #         - "6379:6379"
+  #   steps:
+  #     - name: "Check out repository code"
+  #       uses: "actions/checkout@v4"
+  #     - name: "Setup environment"
+  #       uses: "networktocode/gh-action-setup-poetry-environment@v6"
+  #       with:
+  #         poetry-install-options: ""  # override default "--only dev"
+  #         poetry-version: "2.1.4"
+  #         python-version: "3.12"
+  #     - name: "Install the app"
+  #       run: |
+  #         sed -i -z 's/PLUGINS = \[[^]]*]/PLUGINS = ["${{ matrix.python_package_name }}"]/' nautobot/core/tests/nautobot_config.py
+  #         sed -i 's/TEST_USE_FACTORIES = .*$/TEST_USE_FACTORIES = False/' nautobot/core/tests/nautobot_config.py
+  #         poetry add "git+https://github.com/nautobot/nautobot-app-${{ matrix.app_url }}.git#develop[dev]" --extras all
+  #     - name: "Run unittest"
+  #       run: "poetry run invoke tests --no-keepdb --no-cache-test-fixtures --no-parallel --label ${{ matrix.python_package_name }}"
