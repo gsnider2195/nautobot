@@ -1,0 +1,30 @@
+---
+# Load database dump into the database to reduce the time taken to run migrations during CI
+
+name: "Load pre-migrated database dump"
+inputs:
+  database_name:
+    default: "nautobot"
+  database_user:
+    default: "nautobot"
+  database_dumps_repo:
+    default: "gsnider2195/nautobot-db-dumps"
+  database_dumps_ref:
+    default: "dumps"
+  database_dump_filename:
+    default: "nautobotlatest-pgdump.sql"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Checkout db dumps repository"
+      uses: actions/checkout@v5
+      with:
+        repository: "${{ inputs.database_dumps_repo }}"
+        ref: "${{ inputs.database_dumps_ref }}"
+        path: "db_dumps"
+        sparse-checkout: "${{ inputs.database_dump_filename }}"
+        sparse-checkout-cone-mode: false
+    - name: "Load database dump into the postgres database"
+      run: |
+        psql -h localhost -d nautobot -U $NAUTOBOT_DB_USER < db_dumps/${{ inputs.database_dump_filename }}
