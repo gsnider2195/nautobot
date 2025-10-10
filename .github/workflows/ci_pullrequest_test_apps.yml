@@ -32,23 +32,8 @@ jobs:
         ports:
           - "6379:6379"
     steps:
-      - name: "Checkout db dumps repository"
-        uses: actions/checkout@v5
-        with:
-          repository: "gsnider2195/nautobot-db-dumps"
-          ref: "dumps"
-          # Relative path under $GITHUB_WORKSPACE to place the repository
-          path: "db_dumps"
-          # Do a sparse checkout on given patterns. Each pattern should be separated with
-          # new lines.
-          # Default: null
-          sparse-checkout: "nautobotlatest-pgdump.sql"
-          # Specifies whether to use cone-mode when doing a sparse checkout.
-          # Default: true
-          sparse-checkout-cone-mode: false
-      - name: "Load database dump into the postgres database"
-        run: |
-          psql -h localhost -d nautobot -U $NAUTOBOT_DB_USER < db_dumps/nautobotlatest-pgdump.sql
+      - name: "Load migrated db dump"
+        uses: ./.github/actions/load-database-dump
       # For testing, run check-migrations to verify the dump has loaded
       - name: "Check out repository code"
         uses: "actions/checkout@v4"
