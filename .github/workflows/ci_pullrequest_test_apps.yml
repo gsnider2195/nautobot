@@ -48,7 +48,7 @@ jobs:
           sparse-checkout-cone-mode: false
       - name: "Load database dump into the postgres database"
         run: |
-          pg_restore -h localhost -d nautobot -U $NAUTOBOT_DB_USER < db_dumps/nautobotlatest-pgdump.sql
+          psql -h localhost -d nautobot -U $NAUTOBOT_DB_USER < db_dumps/nautobotlatest-pgdump.sql
       # For testing, run check-migrations to verify the dump has loaded
       - name: "Check out repository code"
         uses: "actions/checkout@v4"
