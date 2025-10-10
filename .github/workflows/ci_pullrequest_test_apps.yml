@@ -6,7 +6,6 @@ concurrency:  # Cancel any existing runs of this workflow for this same PR
   cancel-in-progress: true
 on:  # yamllint disable
   pull_request:
-  workflow_call:
 
 jobs:
   load-db-dump:
