@@ -5,7 +5,7 @@ concurrency:  # Cancel any existing runs of this workflow for this same PR
   group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
 on:  # yamllint disable
-  # pull_request:
+  pull_request:
   workflow_call:
 
 jobs:
@@ -203,7 +203,7 @@ jobs:
         env:
           POSTGRES_USER: "nautobot"
           POSTGRES_PASSWORD: "decinablesprewad"
-          POSTGRES_DB: "nautobot"
+          POSTGRES_DB: "test_nautobot"
         ports:
           - "5432:5432"
       redis:
@@ -213,6 +213,12 @@ jobs:
     steps:
       - name: "Check out repository code"
         uses: "actions/checkout@v4"
+      - name: "Load migrated db dump"
+        uses: ./.github/actions/load-database-dump
+        env:
+          PGPASSWORD: "decinablesprewad"
+        with:
+          database_name: "test_nautobot"
       - name: "Setup environment"
         uses: "networktocode/gh-action-setup-poetry-environment@v6"
         with:
@@ -220,7 +226,7 @@ jobs:
           poetry-version: "2.1.4"
           python-version: "3.9"
       - name: "Run unittest"
-        run: "poetry run invoke tests --failfast --no-keepdb --no-cache-test-fixtures --parallel"
+        run: "poetry run invoke tests --failfast --keepdb --no-cache-test-fixtures --parallel"
     needs:
       - "check-migrations"
       - "check-schema"
@@ -395,7 +401,7 @@ jobs:
         env:
           POSTGRES_USER: "nautobot"
           POSTGRES_PASSWORD: "decinablesprewad"
-          POSTGRES_DB: "nautobot"
+          POSTGRES_DB: "test_nautobot"
         ports:
           - "5432:5432"
       redis:
@@ -409,6 +415,12 @@ jobs:
     steps:
       - name: "Check out repository code"
         uses: "actions/checkout@v4"
+      - name: "Load migrated db dump"
+        uses: ./.github/actions/load-database-dump
+        env:
+          PGPASSWORD: "decinablesprewad"
+        with:
+          database_name: "test_nautobot"
       - name: "Setup environment"
         uses: "networktocode/gh-action-setup-poetry-environment@v6"
         with:
@@ -417,7 +429,7 @@ jobs:
           python-version: "3.12"
       - name: "Run Integration Tests"
         # If NAUTOBOT_SELENIUM_HOST is set to 'localhost' or '127.0.0.1' the connection does not work
-        run: "NAUTOBOT_SELENIUM_HOST=`hostname -f` poetry run invoke tests --tag integration --no-keepdb"
+        run: "NAUTOBOT_SELENIUM_HOST=`hostname -f` poetry run invoke tests --tag integration --keepdb"
     needs:
       - "check-migrations"
       - "check-schema"

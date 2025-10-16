@@ -26,5 +26,6 @@ runs:
         sparse-checkout: "${{ inputs.database_dump_filename }}"
         sparse-checkout-cone-mode: false
     - name: "Load database dump into the postgres database"
+      shell: "bash"
       run: |
-        psql -h localhost -d nautobot -U $NAUTOBOT_DB_USER < db_dumps/${{ inputs.database_dump_filename }}
+        psql -h localhost -d ${{ inputs.database_name }} -U $NAUTOBOT_DB_USER < db_dumps/${{ inputs.database_dump_filename }}
