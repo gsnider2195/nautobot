@@ -203,7 +203,7 @@ jobs:
         env:
           POSTGRES_USER: "nautobot"
           POSTGRES_PASSWORD: "decinablesprewad"
-          POSTGRES_DB: "nautobot"
+          POSTGRES_DB: "test_nautobot"
         ports:
           - "5432:5432"
       redis:
@@ -401,7 +401,7 @@ jobs:
         env:
           POSTGRES_USER: "nautobot"
           POSTGRES_PASSWORD: "decinablesprewad"
-          POSTGRES_DB: "nautobot"
+          POSTGRES_DB: "test_nautobot"
         ports:
           - "5432:5432"
       redis:
