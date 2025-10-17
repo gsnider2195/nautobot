@@ -48,7 +48,8 @@ __all__ = (
 class TestCase(mixins.NautobotTestCaseMixin, _TestCase):
     """Base class for all Nautobot-specific unit tests."""
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         """Initialize user and client."""
         super().setUpNautobot()
 
