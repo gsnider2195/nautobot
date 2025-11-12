@@ -15,8 +15,12 @@ jobs:
     steps:
       - name: "Get user id"
         run: "id"
-      - name: "Get usr/local/bin permissions"
-        run: "ls -al /usr/local/"
+      - name: "Get / permissions"
+        run: "ls -al /"
+      - name: "Get /usr permissions"
+        run: "ls -al /usr"        
+      - name: "Get usr/local permissions"
+        run: "ls -al /usr/local"
   security-tooling:
     name: "Security Tooling"
     runs-on: "ubuntu-22.04"
