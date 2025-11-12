@@ -13,6 +13,8 @@ jobs:
     name: "Get User ID"
     runs-on: "ubuntu-latest"
     steps:
+      - name: "Get PATH"
+        run: "echo $PATH"
       - name: "Check out repository code"
         uses: "actions/checkout@v4"
       - name: "Setup environment"
@@ -23,8 +25,6 @@ jobs:
           python-version: "3.12"    
       - name: "Get user id"
         run: "id"
-      - name: "Get PATH"
-        run: "echo $PATH"
       - name: "Get poetry path"
         run: "which poetry"
       - name: "Get / permissions"
