@@ -9,6 +9,12 @@ on:  # yamllint disable
   workflow_call:
 
 jobs:
+  test-user-id:
+    name: "Get User ID"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Get user id"
+        run: "id"
   security-tooling:
     name: "Security Tooling"
     runs-on: "ubuntu-22.04"
